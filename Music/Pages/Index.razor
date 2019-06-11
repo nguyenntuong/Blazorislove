@@ -1,0 +1,95 @@
+﻿@page "/"
+@using ViewModel
+@using Model
+@inject IJSRuntime JsRuntime;
+<h1>Phát hiện tên bài hát trong video !</h1>
+
+Chào mừng đến với trang web của tôi :))
+
+<div class="input-group mb-3">
+    <input type="text" bind-value-oninput="@viewModel.exampleModel.Url" class="form-control" placeholder="Liên kết đến video Youtube." aria-label="Liên kết đến video Youtube." aria-describedby="button-addon2" />
+    <div class="input-group-append">
+        <button class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="@btn_Find">
+            <span class="oi oi-magnifying-glass"></span>
+            Tìm
+        </button>
+    </div>
+</div>
+<br />
+@if (viewModel.isFind)
+{
+    <div class="container text-center">
+        <div class="spinner-grow" role="status">
+        </div>
+    </div>
+}
+@if (viewModel.exampleModel.Result.Count != 0)
+{
+    <nav class="navbar navbar-light bg-light">
+        <a class="navbar-brand">Danh sách bài hát tìm được</a>
+        <form class="form-inline">
+            <button class="btn btn-outline-danger my-2 my-sm-0" onclick="@btn_Clear" type="submit">Xoá danh sách</button>
+        </form>
+    </nav>
+    <br/>
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+                <div class="list-group">
+                    @foreach (MusicInforModel item in viewModel.exampleModel.Result)
+                    {
+                        <a class="list-group-item list-group-item-action" onclick="@(e=>moreInfor(item))">@item.Title</a>
+                    }
+                </div>
+            </div>
+            <div class="col-6">
+                @if (viewModel.exampleModel.Current != null)
+                {
+                    <a href="" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">@viewModel.exampleModel.Current.Title</h5>
+                            @*<small>3 days ago</small>*@
+                        </div>
+                        <p class="mb-1">@viewModel.exampleModel.Current.Discripton</p>
+                        <small>@viewModel.exampleModel.Current.Author</small>
+                    </a>
+                }
+                else
+                {
+                    <a class="list-group-item list-group-item-action">Chưa chọn bài nào.</a>
+                }
+            </div>
+        </div>
+    </div>
+}
+@functions{
+    private IndexViewModel viewModel { get; } = new IndexViewModel();
+
+    void moreInfor(MusicInforModel infor)
+    {
+        this.StateHasChanged();
+        viewModel.exampleModel.Current = infor;
+        StateHasChanged();
+    }
+    void btn_Clear()
+    {
+        viewModel.exampleModel.Result.Clear();
+        viewModel.exampleModel.Current = null;
+        StateHasChanged();
+    }
+    async void btn_Find(UIMouseEventArgs e)
+    {
+        viewModel.isFind = true;
+        await Task.Delay(1000);
+        viewModel.isFind = false;
+        viewModel.exampleModel.Result.Add(
+            new MusicInforModel()
+            {
+                Title = "Take a hint",
+                Discripton = "So cool",
+                Author = "Unknow"
+            }
+            );
+        StateHasChanged();
+    }
+}

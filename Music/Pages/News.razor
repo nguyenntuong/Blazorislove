@@ -1,0 +1,43 @@
+﻿@page "/news"
+@using Model
+@using ViewModel
+@inject HttpClient http
+
+<h1>Tổng hợp tin tức !</h1>
+
+Chào mừng đến với trang tin của tôi :))
+<br />
+<hr />
+@if (ViewModel.News == null || (ViewModel.News != null && ViewModel.News.Count == 0))
+{
+    <div class="alert alert-warning" role="alert">
+        Hiện chưa có trang báo nào được tải về.
+    </div>
+}
+else
+{
+<div class="list-group">
+    @foreach (NewModel item in ViewModel.News)
+    {
+        <a href="@item.Link" class="list-group-item list-group-item-action">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">@item.Title</h5>
+                <small>@item.pubDate.ToShortDateString()</small>
+            </div>
+            <p class="mb-1">@item.Description</p>
+            <small>@item.Provider</small>
+        </a>
+    }
+</div>
+}
+@functions{
+    private NewsViewModel ViewModel { get; } = new NewsViewModel();
+
+    protected override async Task OnInitAsync()
+    {
+        //string xml = await http.GetStringAsync(new Uri("https://thanhnien.vn/rss/viet-nam.rss"));
+        //Console.WriteLine(xml);
+        //ViewModel.ParseXml(xml);
+        await base.OnInitAsync();
+    }
+}

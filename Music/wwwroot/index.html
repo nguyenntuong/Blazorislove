@@ -1,0 +1,29 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>yMusic</title>
+    <base href="/" />
+    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/site.css" rel="stylesheet" />
+</head>
+<body>
+    <app>
+        <div class="load-div">
+            <div class="loader"></div>
+            <div class="text-center">Loading...</div>
+        </div>
+    </app>
+    <script>
+        function getItem(key) {
+            return window.localStorage.getItem(key);
+        }
+        function setItem(key, value) {
+            window.localStorage.setItem(key, value);
+            return value;
+        }
+    </script>
+    <script src="_framework/blazor.webassembly.js"></script>
+</body>
+</html>

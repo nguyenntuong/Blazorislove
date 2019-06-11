@@ -1,0 +1,90 @@
+﻿@page "/weather"
+@using ViewModel;
+@using AspNetMonsters.Blazor.Geolocation
+@inject HttpClient http
+@inject LocationService LocationService
+
+<nav class="navbar navbar-light bg-light">
+    <a class="navbar-brand">Thông tin thời tiết</a>
+    <div class="form-inline">
+        <input class="form-control mr-sm-2 @ViewModel.invalid" bind-value-oninput="@ViewModel.Location" type="search" placeholder="Location" aria-label="Location" />
+        <button class="btn btn-outline-success my-2 my-sm-0" onclick="@btn_Check" type="submit">Kiểm tra</button>
+    </div>
+</nav>
+<br />
+@if (ViewModel.onFetchData)
+{
+    <div class="container text-center">
+        <div class="spinner-grow" role="status">
+        </div>
+    </div>
+}
+@if (ViewModel._Weather != null)
+{
+<div class="container">
+    <div class="row">
+        <div class="col-6">
+            <div class="list-group">
+                <a class="list-group-item">Tên thành phố:</a>
+                <a class="list-group-item">Nhiệt độ:</a>
+                <a class="list-group-item">Nhiệt độ hiện tại:</a>
+                <a class="list-group-item">Nhiệt độ tối thiểu:</a>
+                <a class="list-group-item">Nhiệt độ tối đa:</a>
+                <a class="list-group-item">Trạng thái:</a>
+                <a class="list-group-item">&nbsp;</a>
+                <a class="list-group-item">Quốc gia:</a>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="list-group">
+                <a class="list-group-item">@ViewModel._Weather.Name</a>
+                <a class="list-group-item">&nbsp;</a>
+                <a class="list-group-item">@ViewModel._Weather.Main.Temp &deg;F</a>
+                <a class="list-group-item">@ViewModel._Weather.Main.TempMin &deg;F</a>
+                <a class="list-group-item">@ViewModel._Weather.Main.TempMax &deg;F</a>
+                <a class="list-group-item">@ViewModel._Weather.WeatherWeather[0].Main</a>
+                <a class="list-group-item">@ViewModel._Weather.WeatherWeather[0].Description</a>
+                <a class="list-group-item">@ViewModel._Weather.Sys.Country</a>
+            </div>
+        </div>
+    </div>
+</div>
+}
+@functions{
+
+    private WeatherViewModel ViewModel { get; } = new WeatherViewModel();
+    async void btn_Check()
+    {
+        if (string.IsNullOrWhiteSpace(ViewModel.Location))
+        {
+            ViewModel.invalid = "alert-warning";
+            StateHasChanged();
+            return;
+        }
+        else
+        {
+            ViewModel.invalid = "";
+        }
+        if (ViewModel._Weather!=null&&ViewModel.Location.ToLower().Equals(ViewModel._Weather.Name.ToLower()))
+        {
+            return;
+        }
+        else
+        {
+            ViewModel._Weather = null;
+        }
+        ViewModel.onFetchData = true;
+
+        ViewModel._Weather = Music.Model.Weather.FromJson(await http.GetStringAsync(
+            $"http://api.openweathermap.org/data/2.5/weather?q={ViewModel.Location}&APPID={ViewModel.APPID}"
+            ));
+        ViewModel.onFetchData = false;
+        StateHasChanged();
+    }
+    protected override async Task OnInitAsync()
+    {
+        var location = await LocationService.GetLocationAsync();
+        Console.WriteLine(location);
+        await base.OnInitAsync();
+    }
+}
